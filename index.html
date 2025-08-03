@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information And Communication Engineering - Student Profiles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #fda085 100%);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .profile-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .ice-logo {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .time-display {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .copy-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .facebook-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .facebook-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .facebook-modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+        .facebook-modal.show .facebook-modal-content {
+            transform: scale(1);
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        .search-input {
+            padding-left: 40px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+        .student-photo {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .student-icon {
+            width: 128px;
+            height: 128px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <!-- ICE Department Info -->
+                <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                    <div class="w-10 h-10 ice-logo rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">ICE</span>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-bold text-gray-800">Information &amp; Communication Engineering</h1>
+                        <p class="text-xs text-gray-600">Pabna University of Science &amp; Technology</p>
+                    </div>
+                </div>
+                
+                <!-- Time Display -->
+                <div class="text-center md:text-right">
+                    <p id="current-time" class="time-display text-lg font-bold"></p>
+                    <p id="current-date" class="text-xs text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="mb-6 text-center">
+            <h2 class="text-2xl font-bold text-white mb-1">ICE Department Students</h2>
+            <p class="text-white/80">Session: 2023-2024</p>
+            <p class="text-white/80">Total Students: <span id="student-count">36</span></p>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="mb-6 max-w-md mx-auto">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="search-input w-full px-4 py-2 pl-10 bg-white/90 backdrop-blur-md rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    placeholder="Search by name or roll number..."
+                >
+            </div>
+        </div>
+        
+        <!-- Student Profiles Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="student-grid">
+            <!-- Student profiles will be generated here -->
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="no-results" class="no-results hidden">
+            <i class="fas fa-search text-4xl mb-4 opacity-50"></i>
+            <p>No students found matching your search.</p>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800/90 backdrop-blur-md text-white py-6 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2023 Pabna University of Science &amp; Technology. All rights reserved.</p>
+            <p class="text-gray-300 mt-1">Information &amp; Communication Engineering Department</p>
+        </div>
+    </footer>
+    
+    <!-- Copy Notification -->
+    <div id="copy-notification" class="copy-notification">
+        <i class="fas fa-check-circle mr-2"></i>Phone number copied to clipboard!
+    </div>
+    
+    <!-- Facebook Modal -->
+    <div id="facebook-modal" class="facebook-modal">
+        <div class="facebook-modal-content">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Add Facebook Link</h3>
+            <p class="text-sm text-gray-600 mb-2">Student: <span id="modal-student-name" class="font-semibold"></span></p>
+            <input type="text" id="facebook-link-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Facebook profile link">
+            <div class="flex justify-end space-x-2 mt-4">
+                <button onclick="closeFacebookModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">Cancel</button>
+                <button onclick="saveFacebookLink()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Student data
+        const students = [
+            { roll: "240601", name: "NAVIN NAWAR", session: "2023-2024", address: "গাজীপুর ,ঢাকা", phone: "01966-267867", facebook: "https://www.facebook.com/navin.nawar.79", photo: "" },
+            { roll: "240602", name: "MST. RUME KHATUN", session: "2023-2024", address: "রাজশাহী", phone: "019711-83496", facebook: "https://www.facebook.com/rumi.khatun.597685", photo: "" },
+            { roll: "240603", name: "NAZMUS SADAT", session: "2023-2024", address: "গাজীপুর", phone: "01602-350701", facebook: "https://www.facebook.com/nazmus.sadat.228522/", photo: "" },
+            { roll: "240604", name: "APURBA CHANDRA SARKER", session: "2023-2024", address: "নেত্রকোণা", phone: "01971-477453", facebook: "https://www.facebook.com/apurba.sarker.5817", photo: "" },
+            { roll: "240605", name: "MD. ARAFAT HOSSAIN", session: "2023-2024", address: "বগুড়া", phone: "01728-473799", facebook: "https://www.facebook.com/arafat.hasan.akash.2024", photo: "" },
+            { roll: "240606", name: "MD. RAHIB CHAWDHURY", session: "2023-2024", address: "দিনাজপুর", phone: "01998-155343", facebook: "https://www.facebook.com/rahib.chawdury", photo: "" },
+            { roll: "240607", name: "Md IFTIKHARUL ISLAM KHAN", session: "2023-2024", address: "টাঙ্গাইল", phone: "01932-804420", facebook: "https://www.facebook.com/Iftikharulislam.khan", photo: "" },
+            { roll: "240608", name: "SHISHIR DEBNATH", session: "2023-2024", address: "টাঙ্গাইল", phone: "01720-342023", facebook: "https://www.facebook.com/shishir.debnath.2025", photo: "" },
+            { roll: "240609", name: "ARAF ZAMAN", session: "2023-2024", address: "পাবনা", phone: "01973-301382", facebook: "https://www.facebook.com/araf.zaman.718", photo: "" },
+            { roll: "240610", name: "SUMAIYA ISLAM OUISHI", session: "2023-2024", address: "নাটোর", phone: "01862-433898", facebook: "https://www.facebook.com/sumaiya.islam.ouishi.2024", photo: "" },
+            { roll: "240611", name: "MD. SAMIUL ALIM", session: "2023-2024", address: "পাবনা", phone: "01825-850540", facebook: "https://www.facebook.com/md.sami.909738", photo: "" },
+            { roll: "240612", name: "MD. SUMON RAYHAN", session: "2023-2024", address: "গাজীপুর", phone: "01306-667836", facebook: "https://www.facebook.com/sumon.rayhan.991390/", photo: "" },
+            { roll: "240613", name: "MD. ASIBUZZAMAN EVAN", session: "2023-2024", address: "সিরাজগঞ্জ", phone: "01827-791122", facebook: "https://www.facebook.com/mdevan.sarker", photo: "" },
+            { roll: "240614", name: "NAEEM AHMED", session: "2023-2024", address: "কিশোরগঞ্জ", phone: "01753-266598", facebook: "https://www.facebook.com/naeemahmed.naeemahmed.98622", photo: "" },
+            { roll: "240615", name: "MD MEHEDI HASAN", session: "2023-2024", address: "সাতক্ষীরা", phone: "01868-809756", facebook: "https://www.facebook.com/md.mehedi.hasan.27943", photo: "" },
+            { roll: "240616", name: "MD.IMRAN HOSSEN", session: "2023-2024", address: "কিশোরগঞ্জ", phone: "01322-439125", facebook: "https://www.facebook.com/profile.php?id=61551652210835", photo: "" },
+            { roll: "240617", name: "ABDULLAH AL-NAFI", session: "2023-2024", address: "ঢাকা", phone: "01724-677082", facebook: "https://www.facebook.com/al.nafee.7", photo: "" },
+            { roll: "240618", name: "MD. HIMEL HOSSEN", session: "2023-2024", address: "যশোর", phone: "01607-788393", facebook: "https://www.facebook.com/md.himelhussain.01#", photo: "" },
+            { roll: "240619", name: "SADMAN SAKIB", session: "2023-2024", address: "রাজশাহী", phone: "01870-938346", facebook: "https://www.facebook.com/sd.sk.52012", photo: "" },
+            { roll: "240620", name: "JYOTIRMOY SANA SHUVO", session: "2023-2024", address: "সাতক্ষীরা", phone: "01766-738407", facebook: "https://www.facebook.com/jyotirmoy.sana.shuvo", photo: "" },
+            { roll: "240621", name: "MD. JOBAYER RAHMAN", session: "2023-2024", address: "শেরপুড়", phone: "01643-851764", facebook: "https://www.facebook.com/JobayerRony5678", photo: "" },
+            { roll: "240622", name: "MD. SALMAN AHMMED AKASH", session: "2023-2024", address: "পাবনা", phone: "01724-285148", facebook: "https://www.facebook.com/md.salman.ahmmed.akash", photo: "" },
+            { roll: "240624", name: "MD. MOZAHIDUL ISLAM", session: "2023-2024", address: "দিনাজপুর", phone: "01330-128867", facebook: "https://www.facebook.com/mozahid.zahid.3975", photo: "" },
+            { roll: "240625", name: "MD. ATIK HASAN", session: "2023-2024", address: "রাজশাহী", phone: "01888-526192", facebook: "https://www.facebook.com/iatikakik", photo: "" },
+            { roll: "240626", name: "MD. SHIFAT HOSSAIN", session: "2023-2024", address: "সিরাজগঞ্জ", phone: "01793-769445", facebook: "https://www.facebook.com/rahat.hossain.949142", photo: "" },
+            { roll: "240627", name: "IMTIAZ AHMED", session: "2023-2024", address: "রাজশাহী", phone: "01311-865439", facebook: "https://www.facebook.com/imtiaz2184", photo: "" },
+            { roll: "240628", name: "SHAHRIAR MAHMUD LEONE", session: "2023-2024", address: "খুলনা", phone: "01775-484703", facebook: "https://www.facebook.com/unknown.trap", photo: "" },
+            { roll: "240629", name: "MD. NAIMUL ISLAM MITHUN", session: "2023-2024", address: "পাবনা", phone: "01980-185857", facebook: "https://www.facebook.com/naimulislam.mithun.94", photo: "" },
+            { roll: "240632", name: "MST. SADIKA RUBIA", session: "2023-2024", address: "দিনাজপুর", phone: "01704-383577", facebook: "https://www.facebook.com/sadika.rubia.rinki", photo: "" },
+            { roll: "240633", name: "MD. ABU SAYED", session: "2023-2024", address: "নবাবগঞ্জ,ঢাকা", phone: "01751-995463", facebook: "https://www.facebook.com/abusayed.sovon", photo: "" },
+            { roll: "240634", name: "MD. MONIRUJJAMAN", session: "2023-2024", address: "পাবনা", phone: "01628-012746", facebook: "https://www.facebook.com/hasib.santo.790", photo: "" },
+            { roll: "240635", name: "MD. HASIBUL ISLAM", session: "2023-2024", address: "পাবনা", phone: "01744-204817", facebook: "https://www.facebook.com/monirul2746", photo: "" },
+            { roll: "240638", name: "IMRAN IMTIAZ KHAN", session: "2023-2024", address: "খুলনা", phone: "01519-603757", facebook: "https://www.facebook.com/imra.imtiaz.khan", photo: "" },
+            { roll: "240639", name: "MD. ASHRAF JANIN KHAN", session: "2023-2024", address: "পাবনা", phone: "01560-014206", facebook: "https://www.facebook.com/ashrafkhanshafi", photo: "" },
+            { roll: "240640", name: "AZMAL SABBIR", session: "2023-2024", address: "রাজশাহী", phone: "01712-996768", facebook: "https://www.facebook.com/Azmalsabbir19", photo: "" },
+            { roll: "240641", name: "MD. MAHFUZUR RAHMAN EMON", session: "2023-2024", address: "কুষ্টিয়া", phone: "01521-720760", facebook: "https://www.facebook.com/memonmirpur", photo: "" }
+        ];
+        
+        let currentStudentIndex = null;
+        let filteredStudents = [...students];
+        
+        // Generate student profiles
+        function generateStudentProfiles() {
+            const studentGrid = document.getElementById('student-grid');
+            const noResults = document.getElementById('no-results');
+            studentGrid.innerHTML = '';
+            
+            if (filteredStudents.length === 0) {
+                studentGrid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            } else {
+                studentGrid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                
+                filteredStudents.forEach((student, index) => {
+                    const originalIndex = students.findIndex(s => s.roll === student.roll);
+                    const profileCard = document.createElement('div');
+                    profileCard.className = 'profile-card bg-white/90 backdrop-blur-md rounded-xl overflow-hidden';
+                    
+                    const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                    
+                    profileCard.innerHTML = `
+                        <div class="ice-logo p-3 flex items-center">
+                            <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mr-2">
+                                <span class="text-white font-bold text-sm">ICE</span>
+                            </div>
+                            <div class="text-white">
+                                <span class="text-xs font-medium">Information And Communication Engineering</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex flex-col items-center mb-3">
+                                <div class="mb-2">
+                                    ${student.photo ? `
+                                        <img src="${student.photo}" 
+                                             alt="Student Photo" 
+                                             class="student-photo">
+                                    ` : `
+                                        <div class="student-icon">
+                                            ${initials}
+                                        </div>
+                                    `}
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 text-center">${student.name}</h3>
+                                <p class="text-xs text-gray-600 font-medium">Roll: ${student.roll}</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-graduation-cap text-blue-600 w-5 text-sm"></i>
+                                    <span class="text-gray-700 ml-2 text-sm">Session: ${student.session}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-map-marker-alt text-green-600 w-5 text-sm"></i>
+                                    <span class="text-gray-700 ml-2 text-sm">Address: ${student.address}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-phone text-purple-600 w-5 text-sm"></i>
+                                        <a href="tel:${student.phone}" class="text-gray-700 ml-2 hover:text-purple-600 transition text-sm">${student.phone}</a>
+                                    </div>
+                                    <button class="text-gray-500 hover:text-blue-600 transition" onclick="copyPhoneNumber('${student.phone}')" title="Copy phone number">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-facebook text-blue-600 w-5 text-sm"></i>
+                                        <a href="${student.facebook || '#'}" target="_blank" class="text-gray-700 ml-2 hover:text-blue-600 transition text-sm">
+                                            ${student.facebook ? 'Facebook Profile' : 'Add Facebook'}
+                                        </a>
+                                    </div>
+                                    <button class="text-gray-500 hover:text-blue-600 transition" onclick="openFacebookModal(${originalIndex})" title="${student.facebook ? 'Copy Facebook link' : 'Add Facebook link'}">
+                                        <i class="fas ${student.facebook ? 'fa-copy' : 'fa-plus'}"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    studentGrid.appendChild(profileCard);
+                });
+            }
+            
+            document.getElementById('student-count').textContent = filteredStudents.length;
+        }
+        
+        // Search functionality
+        function searchStudents() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredStudents = [...students];
+            } else {
+                filteredStudents = students.filter(student => 
+                    student.name.toLowerCase().includes(searchTerm) || 
+                    student.roll.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            generateStudentProfiles();
+        }
+        
+        // Update current time in header
+        function updateHeaderTime() {
+            const timeElement = document.getElementById('current-time');
+            const dateElement = document.getElementById('current-date');
+            if (timeElement && dateElement) {
+                const now = new Date();
+                
+                timeElement.textContent = now.toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                
+                dateElement.textContent = now.toLocaleString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+        
+        // Copy phone number to clipboard
+        function copyPhoneNumber(phoneNumber) {
+            navigator.clipboard.writeText(phoneNumber).then(() => {
+                const notification = document.getElementById('copy-notification');
+                notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Phone number copied to clipboard!';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy phone number: ', err);
+            });
+        }
+        
+        // Open Facebook modal
+        function openFacebookModal(studentIndex) {
+            currentStudentIndex = studentIndex;
+            const student = students[studentIndex];
+            document.getElementById('modal-student-name').textContent = student.name;
+            document.getElementById('facebook-link-input').value = student.facebook || '';
+            document.getElementById('facebook-modal').classList.add('show');
+        }
+        
+        // Close Facebook modal
+        function closeFacebookModal() {
+            document.getElementById('facebook-modal').classList.remove('show');
+            currentStudentIndex = null;
+        }
+        
+        // Save Facebook link
+        function saveFacebookLink() {
+            if (currentStudentIndex !== null) {
+                const facebookLink = document.getElementById('facebook-link-input').value.trim();
+                students[currentStudentIndex].facebook = facebookLink;
+                
+                const notification = document.getElementById('copy-notification');
+                notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Facebook link saved successfully!';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+                
+                closeFacebookModal();
+                searchStudents();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateStudentProfiles();
+            updateHeaderTime();
+            
+            document.getElementById('search-input').addEventListener('input', searchStudents);
+            
+            setInterval(() => {
+                updateHeaderTime();
+            }, 1000);
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('facebook-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFacebookModal();
+            }
+        });
+    </script>
+</body>
+</html>
