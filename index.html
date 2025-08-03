@@ -129,11 +129,11 @@
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Header -->
+    
     <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 py-2">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <!-- ICE Department Info -->
+            
                 <div class="flex items-center space-x-3 mb-2 md:mb-0">
                     <div class="w-10 h-10 ice-logo rounded-lg flex items-center justify-center">
                         <span class="text-white font-bold text-xl">ICE</span>
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 
-                <!-- Time Display -->
+               
                 <div class="text-center md:text-right">
                     <p id="current-time" class="time-display text-lg font-bold"></p>
                     <p id="current-date" class="text-xs text-gray-600"></p>
@@ -153,7 +153,6 @@
         </div>
     </header>
     
-    <!-- Main Content -->
     <main class="container mx-auto px-4 py-6">
         <div class="mb-6 text-center">
             <h2 class="text-2xl font-bold text-white mb-1">ICE Department Students</h2>
@@ -161,7 +160,7 @@
             <p class="text-white/80">Total Students: <span id="student-count">36</span></p>
         </div>
         
-        <!-- Search Bar -->
+        
         <div class="mb-6 max-w-md mx-auto">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
@@ -174,19 +173,15 @@
             </div>
         </div>
         
-        <!-- Student Profiles Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="student-grid">
-            <!-- Student profiles will be generated here -->
+            
         </div>
-        
-        <!-- No Results Message -->
         <div id="no-results" class="no-results hidden">
             <i class="fas fa-search text-4xl mb-4 opacity-50"></i>
             <p>No students found matching your search.</p>
         </div>
     </main>
     
-    <!-- Footer -->
     <footer class="bg-gray-800/90 backdrop-blur-md text-white py-6 mt-8">
         <div class="container mx-auto px-4 text-center">
             <p>© 2023 Pabna University of Science &amp; Technology. All rights reserved.</p>
@@ -194,12 +189,10 @@
         </div>
     </footer>
     
-    <!-- Copy Notification -->
     <div id="copy-notification" class="copy-notification">
         <i class="fas fa-check-circle mr-2"></i>Phone number copied to clipboard!
     </div>
     
-    <!-- Facebook Modal -->
     <div id="facebook-modal" class="facebook-modal">
         <div class="facebook-modal-content">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Add Facebook Link</h3>
@@ -213,7 +206,6 @@
     </div>
     
     <script>
-        // Student data
         const students = [
             { roll: "240601", name: "NAVIN NAWAR", session: "2023-2024", address: "গাজীপুর ,ঢাকা", phone: "01966-267867", facebook: "https://www.facebook.com/navin.nawar.79", photo: "https://i.postimg.cc/Jz76xFCR/navin-jpg.jpg" },
             { roll: "240602", name: "MST. RUME KHATUN", session: "2023-2024", address: "রাজশাহী", phone: "019711-83496", facebook: "https://www.facebook.com/rumi.khatun.597685", photo: "" },
@@ -255,8 +247,6 @@
         
         let currentStudentIndex = null;
         let filteredStudents = [...students];
-        
-        // Generate student profiles
         function generateStudentProfiles() {
             const studentGrid = document.getElementById('student-grid');
             const noResults = document.getElementById('no-results');
@@ -343,7 +333,6 @@
             document.getElementById('student-count').textContent = filteredStudents.length;
         }
         
-        // Search functionality
         function searchStudents() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             
@@ -359,7 +348,6 @@
             generateStudentProfiles();
         }
         
-        // Update current time in header
         function updateHeaderTime() {
             const timeElement = document.getElementById('current-time');
             const dateElement = document.getElementById('current-date');
@@ -382,7 +370,6 @@
             }
         }
         
-        // Copy phone number to clipboard
         function copyPhoneNumber(phoneNumber) {
             navigator.clipboard.writeText(phoneNumber).then(() => {
                 const notification = document.getElementById('copy-notification');
@@ -397,7 +384,6 @@
             });
         }
         
-        // Open Facebook modal
         function openFacebookModal(studentIndex) {
             currentStudentIndex = studentIndex;
             const student = students[studentIndex];
@@ -406,13 +392,11 @@
             document.getElementById('facebook-modal').classList.add('show');
         }
         
-        // Close Facebook modal
         function closeFacebookModal() {
             document.getElementById('facebook-modal').classList.remove('show');
             currentStudentIndex = null;
         }
         
-        // Save Facebook link
         function saveFacebookLink() {
             if (currentStudentIndex !== null) {
                 const facebookLink = document.getElementById('facebook-link-input').value.trim();
@@ -431,7 +415,6 @@
             }
         }
         
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             generateStudentProfiles();
             updateHeaderTime();
@@ -443,7 +426,6 @@
             }, 1000);
         });
         
-        // Close modal when clicking outside
         document.getElementById('facebook-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeFacebookModal();
@@ -453,6 +435,7 @@
 </body>
 
 </html>
+
 
 
 
