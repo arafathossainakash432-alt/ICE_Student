@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Google tag (gtag.js) -->
+    
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBKL8ZW4ZB"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-MBKL8ZW4ZB');
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Information And Communication Engineering - Student Profiles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { 
@@ -135,6 +136,84 @@
             border: 4px solid white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        .pdf-button {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            transition: all 0.3s ease;
+        }
+        .pdf-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .edu-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .folder-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .folder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+        .folder-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .file-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .file-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: #10b981;
+        }
+        .file-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            color: #6b7280;
+        }
+        .breadcrumb-item:not(:last-child)::after {
+            content: '/';
+            margin: 0 8px;
+            color: #9ca3af;
+        }
+        .breadcrumb-item.active {
+            color: #3b82f6;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -162,11 +241,46 @@
         </div>
     </header>
     
+
+    <div class="container mx-auto px-4 py-6">
+        <div class="edu-panel p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Website Maintenance by Md. Arafat Hossain...</h2>
+                <h1>(No PDF has been attached)</h1>
+            </div>
+            
+            
+            <div id="breadcrumb" class="breadcrumb mb-6">
+                <div class="breadcrumb-item active" data-level="root">
+                    <i class="fas fa-home mr-1"></i> Home
+                </div>
+            </div>
+            
+            
+            <div id="folders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                
+            </div>
+            
+            
+            <div id="files-container" class="hidden">
+                <div class="mb-6">
+                    <h3 id="current-folder-name" class="text-xl font-bold text-gray-800"></h3>
+                </div>
+                <div id="files-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <main class="container mx-auto px-4 py-6">
         <div class="mb-6 text-center">
             <h2 class="text-2xl font-bold text-white mb-1">ICE Department Students</h2>
             <p class="text-white/80">Session: 2023-2024</p>
             <p class="text-white/80">Total Students: <span id="student-count">36</span></p>
+            <button id="generate-pdf-btn" class="pdf-button mt-3 px-4 py-2 text-white rounded-lg flex items-center justify-center mx-auto">
+                <i class="fas fa-file-pdf mr-2"></i> Generate Student PDF
+            </button>
         </div>
         
         
@@ -257,8 +371,43 @@
             { roll: "210636", name: "MST. MAYA AKTER", session: "2020-2021", address: "ময়মনসিংহ", phone: "01967653549", facebook: "https://www.facebook.com/maya.akter.588886", photo: "" }
         ];
         
+        let educationalFolders = [
+            {
+                id: 1,
+                name: "ICE 1st Year 1st Semester",
+                description: "",
+                icon: "fa-chalkboard-teacher",
+                files: [
+                         
+                    { id: 1, name: "22-23 Session Question ", url: "https://drive.google.com/file/d/137pjC7Jrkyzs_F9257XGiDODowVHF9iH/view?usp=drive_link" },
+                    { id: 2, name: "Lab Report", url: "" },
+                    { id: 3, name: "Cover Page", url: "" },
+                    { id: 2, name: "Book Pdf", url: "" },
+                    { id: 3, name: "All Pdf", url: "" },
+                    { id: 2, name: "All Question", url: "" },
+                    { id: 3, name: "", url: "" },
+                    { id: 2, name: "", url: "" },
+                    { id: 3, name: "", url: "" }
+                
+                ]
+            },
+            {
+                id: 2,
+                name: "ICE 1st Year 2nd Semester ",
+                description: "",
+                icon: "fa-chalkboard-teacher",
+                files: [
+                    { id: 1, name: "", url: "" },
+                    { id: 2, name: "", url: "" }
+                ]
+            },
+        
+        ];
+        
+        let currentFolderId = null;
         let currentStudentIndex = null;
         let filteredStudents = [...students];
+        
         function generateStudentProfiles() {
             const studentGrid = document.getElementById('student-grid');
             const noResults = document.getElementById('no-results');
@@ -345,6 +494,128 @@
             document.getElementById('student-count').textContent = filteredStudents.length;
         }
         
+        function generateFolders() {
+            const foldersContainer = document.getElementById('folders-container');
+            foldersContainer.innerHTML = '';
+            
+            if (educationalFolders.length === 0) {
+                foldersContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <i class="fas fa-folder-open text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600">No folders available yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            educationalFolders.forEach(folder => {
+                const folderCard = document.createElement('div');
+                folderCard.className = 'folder-card bg-white rounded-xl p-4 text-center';
+                folderCard.onclick = () => openFolder(folder.id);
+                
+                folderCard.innerHTML = `
+                    <div class="flex justify-center mb-3">
+                        <div class="folder-icon">
+                            <i class="fas ${folder.icon}"></i>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-1">${folder.name}</h3>
+                    <p class="text-sm text-gray-600 mb-2">${folder.description}</p>
+                    <div class="text-xs text-gray-500">
+                        <i class="fas fa-file-pdf mr-1"></i> ${folder.files.length} files
+                    </div>
+                `;
+                
+                foldersContainer.appendChild(folderCard);
+            });
+        }
+        
+        function generateFiles(folderId) {
+            const folder = educationalFolders.find(f => f.id === folderId);
+            if (!folder) return;
+            
+            const filesGrid = document.getElementById('files-grid');
+            filesGrid.innerHTML = '';
+            
+            if (folder.files.length === 0) {
+                filesGrid.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <i class="fas fa-file-pdf text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600">No files in this folder yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            folder.files.forEach(file => {
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card bg-white rounded-xl p-4';
+                
+                fileCard.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="file-icon mr-4">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800 mb-3">${file.name}</h4>
+                            <div class="flex space-x-2">
+                                <a href="${file.url}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg transition text-sm">
+                                    <i class="fas fa-download mr-1"></i> Download
+                                </a>
+                                <button onclick="copyPdfLink('${file.url}')" class="w-10 h-10 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition flex items-center justify-center">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                filesGrid.appendChild(fileCard);
+            });
+        }
+        
+        function openFolder(folderId) {
+            currentFolderId = folderId;
+            const folder = educationalFolders.find(f => f.id === folderId);
+            
+            
+            const breadcrumb = document.getElementById('breadcrumb');
+            breadcrumb.innerHTML = `
+                <div class="breadcrumb-item" data-level="root" onclick="backToFolders()">
+                    <i class="fas fa-home mr-1"></i> Home
+                </div>
+                <div class="breadcrumb-item active">
+                    <i class="fas fa-folder mr-1"></i> ${folder.name}
+                </div>
+            `;
+            
+            
+            document.getElementById('current-folder-name').textContent = folder.name;
+            
+        
+            document.getElementById('folders-container').classList.add('hidden');
+            document.getElementById('files-container').classList.remove('hidden');
+            
+    
+            generateFiles(folderId);
+        }
+        
+        function backToFolders() {
+            currentFolderId = null;
+            
+        
+            const breadcrumb = document.getElementById('breadcrumb');
+            breadcrumb.innerHTML = `
+                <div class="breadcrumb-item active" data-level="root">
+                    <i class="fas fa-home mr-1"></i> Home
+                </div>
+            `;
+            
+        
+            document.getElementById('folders-container').classList.remove('hidden');
+            document.getElementById('files-container').classList.add('hidden');
+        }
+        
         function searchStudents() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             
@@ -396,6 +667,20 @@
             });
         }
         
+        function copyPdfLink(pdfUrl) {
+            navigator.clipboard.writeText(pdfUrl).then(() => {
+                const notification = document.getElementById('copy-notification');
+                notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PDF link copied to clipboard!';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy PDF link: ', err);
+            });
+        }
+        
         function openFacebookModal(studentIndex) {
             currentStudentIndex = studentIndex;
             const student = students[studentIndex];
@@ -427,11 +712,84 @@
             }
         }
         
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+        
+            doc.setFontSize(20);
+            doc.text('Information And Communication Engineering', 105, 15, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('Pabna University of Science & Technology', 105, 25, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text('Student Profiles', 105, 35, { align: 'center' });
+            
+        
+            const now = new Date();
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${now.toLocaleDateString()}`, 105, 45, { align: 'center' });
+            
+            
+            doc.text(`Total Students: ${filteredStudents.length}`, 105, 52, { align: 'center' });
+            
+            
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Roll', 20, 65);
+            doc.text('Name', 50, 65);
+            doc.text('Session', 120, 65);
+            doc.text('Phone', 150, 65);
+            
+            
+            doc.setFont(undefined, 'normal');
+            
+        
+            let yPosition = 75;
+            filteredStudents.forEach((student, index) => {
+                
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                    
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Roll', 20, yPosition);
+                    doc.text('Name', 50, yPosition);
+                    doc.text('Session', 120, yPosition);
+                    doc.text('Phone', 150, yPosition);
+                    doc.setFont(undefined, 'normal');
+                    yPosition += 10;
+                }
+                
+                
+                doc.text(student.roll, 20, yPosition);
+                doc.text(student.name, 50, yPosition);
+                doc.text(student.session, 120, yPosition);
+                doc.text(student.phone, 150, yPosition);
+                
+                yPosition += 8;
+            });
+            
+            
+            doc.save('ICE_Student_Profiles.pdf');
+            
+            
+            const notification = document.getElementById('copy-notification');
+            notification.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PDF generated successfully!';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             generateStudentProfiles();
+            generateFolders();
             updateHeaderTime();
             
             document.getElementById('search-input').addEventListener('input', searchStudents);
+            document.getElementById('generate-pdf-btn').addEventListener('click', generatePDF);
             
             setInterval(() => {
                 updateHeaderTime();
@@ -445,31 +803,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
